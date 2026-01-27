@@ -90,23 +90,23 @@ run_step "Testing" "test" "npm run test || true"
 # Build TypeScript
 run_step "Building TypeScript" "build" "npm run build" || exit 1
 
-# Build Docker image
-echo "→ Building Docker image..."
+# Build container image with Podman
+echo "→ Building container image with Podman..."
 if [ "$VERBOSE" = true ]; then
-    if docker build -t apptio-target-process-mcp:local .; then
-        echo -e "${GREEN}${CHECK_MARK} Docker build successful${NC}"
+    if podman build -t apptio-target-process-mcp:local .; then
+        echo -e "${GREEN}${CHECK_MARK} Podman build successful${NC}"
     else
-        echo -e "${RED}${X_MARK} Docker build failed${NC}"
+        echo -e "${RED}${X_MARK} Podman build failed${NC}"
         exit 1
     fi
 else
-    DOCKER_LOG="$TEMP_DIR/docker-build.log"
-    if docker build -t apptio-target-process-mcp:local . > "$DOCKER_LOG" 2>&1; then
-        echo -e "${GREEN}${CHECK_MARK} Docker build successful${NC} (log: $DOCKER_LOG)"
-        check_log_size "$DOCKER_LOG"
+    PODMAN_LOG="$TEMP_DIR/podman-build.log"
+    if podman build -t apptio-target-process-mcp:local . > "$PODMAN_LOG" 2>&1; then
+        echo -e "${GREEN}${CHECK_MARK} Podman build successful${NC} (log: $PODMAN_LOG)"
+        check_log_size "$PODMAN_LOG"
     else
-        echo -e "${RED}${X_MARK} Docker build failed${NC} (see details in $DOCKER_LOG)"
-        check_log_size "$DOCKER_LOG"
+        echo -e "${RED}${X_MARK} Podman build failed${NC} (see details in $PODMAN_LOG)"
+        check_log_size "$PODMAN_LOG"
         exit 1
     fi
 fi
