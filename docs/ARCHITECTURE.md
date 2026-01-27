@@ -51,7 +51,7 @@ classDiagram
     
     class TPService {
         -baseUrl: string
-        -auth: string
+        -accessToken: string
         -retryConfig: RetryConfig
         -validEntityTypesCache: string[]
         +constructor(config: TPServiceConfig)
@@ -265,8 +265,7 @@ The Target Process MCP server can be configured in two ways:
 
 1. **Environment Variables:**
    - `TP_DOMAIN`: Target Process domain (e.g., "company.tpondemand.com")
-   - `TP_USERNAME`: Username for authentication
-   - `TP_PASSWORD`: Password for authentication
+   - `TP_ACCESS_TOKEN`: Personal access token for authentication
 
 2. **Configuration File:**
    - Located at `config/targetprocess.json`

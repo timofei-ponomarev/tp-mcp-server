@@ -18,23 +18,20 @@ import { InspectObjectTool } from './tools/inspect/inspect.tool.js';
 
 function loadConfig(): TPServiceConfig {
   // Try environment variables first
-  if (process.env.TP_DOMAIN && process.env.TP_USERNAME && process.env.TP_PASSWORD) {
+  if (process.env.TP_DOMAIN && process.env.TP_ACCESS_TOKEN) {
     return {
       domain: process.env.TP_DOMAIN,
-      credentials: {
-        username: process.env.TP_USERNAME,
-        password: process.env.TP_PASSWORD
-      }
+      accessToken: process.env.TP_ACCESS_TOKEN
     };
   }
 
   // Fall back to config file
   const configPath = path.join(process.cwd(), 'config', 'targetprocess.json');
   if (!fs.existsSync(configPath)) {
-    console.error('No configuration found. Please set environment variables (TP_DOMAIN, TP_USERNAME, TP_PASSWORD) or create config/targetprocess.json');
+    console.error('No configuration found. Please set environment variables (TP_DOMAIN, TP_ACCESS_TOKEN) or create config/targetprocess.json');
     throw new McpError(
       ErrorCode.InternalError,
-      'No configuration found. Please set environment variables (TP_DOMAIN, TP_USERNAME, TP_PASSWORD) or create config/targetprocess.json'
+      'No configuration found. Please set environment variables (TP_DOMAIN, TP_ACCESS_TOKEN) or create config/targetprocess.json'
     );
   }
 

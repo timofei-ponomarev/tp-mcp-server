@@ -10,11 +10,8 @@ if [ ! -f "/app/config/targetprocess.json" ]; then
     if [ ! -z "$TP_DOMAIN" ]; then
         sed -i "s/your-domain.tpondemand.com/$TP_DOMAIN/g" /app/config/targetprocess.json
     fi
-    if [ ! -z "$TP_USERNAME" ]; then
-        sed -i "s/your-username/$TP_USERNAME/g" /app/config/targetprocess.json
-    fi
-    if [ ! -z "$TP_PASSWORD" ]; then
-        sed -i "s/your-password/$TP_PASSWORD/g" /app/config/targetprocess.json
+    if [ ! -z "$TP_ACCESS_TOKEN" ]; then
+        sed -i "s/your-access-token/$TP_ACCESS_TOKEN/g" /app/config/targetprocess.json
     fi
 fi
 

@@ -77,16 +77,14 @@ You can use the published image:
 ```bash
 docker run -i --rm \
   -e TP_DOMAIN=your-domain.tpondemand.com \
-  -e TP_USERNAME=your-username \
-  -e TP_PASSWORD=your-password \
+  -e TP_ACCESS_TOKEN=your-access-token \
   ghcr.io/aaronsb/apptio-target-process-mcp
 ```
 
 ### Environment Variables
 
 - `TP_DOMAIN`: Your Targetprocess domain (e.g., company.tpondemand.com)
-- `TP_USERNAME`: Your Targetprocess username
-- `TP_PASSWORD`: Your Targetprocess password
+- `TP_ACCESS_TOKEN`: Your Targetprocess personal access token (create in My Profile > Access Tokens)
 
 ### Local Development with Docker
 
@@ -257,10 +255,7 @@ The server can be configured either through environment variables or a JSON conf
 ```json
 {
   "domain": "your-domain.tpondemand.com",
-  "credentials": {
-    "username": "your-username",
-    "password": "your-password"
-  }
+  "accessToken": "your-access-token"
 }
 ```
 

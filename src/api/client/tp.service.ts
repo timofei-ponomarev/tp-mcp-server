@@ -22,10 +22,7 @@ interface ApiErrorResponse {
 
 export interface TPServiceConfig {
   domain: string;
-  credentials: {
-    username: string;
-    password: string;
-  };
+  accessToken: string;
   retry?: RetryConfig;
 }
 
@@ -34,7 +31,7 @@ export interface TPServiceConfig {
  */
 export class TPService {
   private readonly baseUrl: string;
-  private readonly auth: string;
+  private readonly accessToken: string;
 
   private readonly retryConfig: RetryConfig;
 
@@ -189,9 +186,9 @@ export class TPService {
   }
 
   constructor(config: TPServiceConfig) {
-    const { domain, credentials: { username, password }, retry } = config;
+    const { domain, accessToken, retry } = config;
     this.baseUrl = `https://${domain}/api/v1`;
-    this.auth = Buffer.from(`${username}:${password}`).toString('base64');
+    this.accessToken = accessToken;
     this.retryConfig = retry || {
       maxRetries: 3,
       delayMs: 1000,
@@ -363,9 +360,9 @@ export class TPService {
       }
 
       return await this.executeWithRetry(async () => {
+        params.append('access_token', this.accessToken);
         const response = await fetch(`${this.baseUrl}/${validatedType}s?${params}`, {
           headers: {
-            'Authorization': `Basic ${this.auth}`,
             'Accept': 'application/json'
           }
         });
@@ -409,9 +406,9 @@ export class TPService {
       }
 
       return await this.executeWithRetry(async () => {
+        params.append('access_token', this.accessToken);
         const response = await fetch(`${this.baseUrl}/${validatedType}s/${id}?${params}`, {
           headers: {
-            'Authorization': `Basic ${this.auth}`,
             'Accept': 'application/json'
           }
         });
@@ -445,10 +442,10 @@ export class TPService {
       const validatedType = await this.validateEntityType(type);
       
       return await this.executeWithRetry(async () => {
-        const response = await fetch(`${this.baseUrl}/${validatedType}s`, {
+        const params = new URLSearchParams({ access_token: this.accessToken });
+        const response = await fetch(`${this.baseUrl}/${validatedType}s?${params}`, {
           method: 'POST',
           headers: {
-            'Authorization': `Basic ${this.auth}`,
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
@@ -485,10 +482,10 @@ export class TPService {
       const validatedType = await this.validateEntityType(type);
       
       return await this.executeWithRetry(async () => {
-        const response = await fetch(`${this.baseUrl}/${validatedType}s/${id}`, {
+        const params = new URLSearchParams({ access_token: this.accessToken });
+        const response = await fetch(`${this.baseUrl}/${validatedType}s/${id}?${params}`, {
           method: 'POST',
           headers: {
-            'Authorization': `Basic ${this.auth}`,
             'Content-Type': 'application/json',
             'Accept': 'application/json'
           },
@@ -548,10 +545,12 @@ export class TPService {
   async fetchMetadata(): Promise<any> {
     try {
       return await this.executeWithRetry(async () => {
-        // Explicitly request JSON format in the URL
-        const response = await fetch(`${this.baseUrl}/Index/meta?format=json`, {
+        const params = new URLSearchParams({
+          format: 'json',
+          access_token: this.accessToken
+        });
+        const response = await fetch(`${this.baseUrl}/Index/meta?${params}`, {
           headers: {
-            'Authorization': `Basic ${this.auth}`,
             'Accept': 'application/json'
           }
         });

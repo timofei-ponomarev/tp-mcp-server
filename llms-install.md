@@ -10,8 +10,7 @@ This guide provides detailed instructions for AI assistants like Cline to help u
 
 2. A Targetprocess account with:
    - Domain (e.g., company.tpondemand.com)
-   - Username
-   - Password
+   - Personal access token (create in My Profile > Access Tokens)
    - API access permissions
 
 ## One-Click Installation Steps
@@ -42,15 +41,12 @@ Edit: `~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_m
         "-e",
         "TP_DOMAIN",
         "-e",
-        "TP_USERNAME",
-        "-e",
-        "TP_PASSWORD",
+        "TP_ACCESS_TOKEN",
         "ghcr.io/aaronsb/apptio-target-process-mcp:latest"
       ],
       "env": {
         "TP_DOMAIN": "your-domain.tpondemand.com",
-        "TP_USERNAME": "your-username",
-        "TP_PASSWORD": "your-password"
+        "TP_ACCESS_TOKEN": "your-access-token"
       },
       "autoApprove": [],
       "disabled": false
@@ -75,15 +71,12 @@ Edit: `~/.config/Claude/claude_desktop_config.json` (Linux/Mac) or `%APPDATA%\Cl
         "-e",
         "TP_DOMAIN",
         "-e",
-        "TP_USERNAME",
-        "-e",
-        "TP_PASSWORD",
+        "TP_ACCESS_TOKEN",
         "ghcr.io/aaronsb/apptio-target-process-mcp:latest"
       ],
       "env": {
         "TP_DOMAIN": "your-domain.tpondemand.com",
-        "TP_USERNAME": "your-username",
-        "TP_PASSWORD": "your-password"
+        "TP_ACCESS_TOKEN": "your-access-token"
       },
       "autoApprove": [],
       "disabled": false
@@ -108,15 +101,12 @@ Edit: `~/.config/goose/config.json` (Linux/Mac) or `%APPDATA%\goose\config.json`
         "-e",
         "TP_DOMAIN",
         "-e",
-        "TP_USERNAME",
-        "-e",
-        "TP_PASSWORD",
+        "TP_ACCESS_TOKEN",
         "ghcr.io/aaronsb/apptio-target-process-mcp:latest"
       ],
       "env": {
         "TP_DOMAIN": "your-domain.tpondemand.com",
-        "TP_USERNAME": "your-username",
-        "TP_PASSWORD": "your-password"
+        "TP_ACCESS_TOKEN": "your-access-token"
       },
       "autoApprove": [],
       "disabled": false
@@ -130,8 +120,7 @@ Edit: `~/.config/goose/config.json` (Linux/Mac) or `%APPDATA%\goose\config.json`
 Replace the following values in your configuration:
 
 - `TP_DOMAIN`: Your Targetprocess domain (e.g., company.tpondemand.com)
-- `TP_USERNAME`: Your Targetprocess username
-- `TP_PASSWORD`: Your Targetprocess password
+- `TP_ACCESS_TOKEN`: Your Targetprocess personal access token (create in My Profile > Access Tokens)
 
 ### 4. Verification
 
@@ -178,10 +167,7 @@ cp config/targetprocess.example.json config/targetprocess.json
 ```json
 {
   "domain": "your-domain.tpondemand.com",
-  "credentials": {
-    "username": "your-username",
-    "password": "your-password"
-  }
+  "accessToken": "your-access-token"
 }
 ```
 
@@ -218,9 +204,9 @@ npm run build
    - Solution: `docker ps` to check if Docker is running, verify credentials in your config
 
 2. **Authentication Error**
-   - Double-check your username and password
+   - Double-check your access token
    - Verify your account has API access permissions
-   - Solution: Test your credentials by logging into the Targetprocess web interface
+   - Solution: Create a new access token in My Profile > Access Tokens
 
 3. **Docker Image Not Found**
    - Run `docker pull ghcr.io/aaronsb/apptio-target-process-mcp:latest` to manually pull the image
@@ -247,10 +233,10 @@ If you encounter issues:
 
 ## Security Considerations
 
-- Store your credentials securely
-- Consider using environment variables instead of hardcoding credentials
+- Store your access token securely
+- Consider using environment variables instead of hardcoding the token
 - Use a dedicated API user with appropriate permissions
-- Regularly rotate passwords for security
+- Deactivate unused tokens in your Targetprocess profile
 
 ## Quick Reference
 
