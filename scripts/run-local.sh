@@ -3,6 +3,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
+CONTAINER_NAME="apptio-target-process-mcp"
 
 # Load .env file if it exists
 if [ -f "$PROJECT_DIR/.env" ]; then
@@ -17,7 +18,18 @@ if [ -z "$TP_DOMAIN" ] || [ -z "$TP_ACCESS_TOKEN" ]; then
     exit 1
 fi
 
-podman run --rm -i \
+# Stop existing container if running
+podman stop "$CONTAINER_NAME" 2>/dev/null || true
+podman rm "$CONTAINER_NAME" 2>/dev/null || true
+
+# Run in detached mode with stdin open
+podman run -d -it \
+  --name "$CONTAINER_NAME" \
   -e TP_DOMAIN="$TP_DOMAIN" \
   -e TP_ACCESS_TOKEN="$TP_ACCESS_TOKEN" \
   apptio-target-process-mcp:local
+
+echo "Container started: $CONTAINER_NAME"
+echo "View logs:  podman logs -f $CONTAINER_NAME"
+echo "Attach:     podman attach $CONTAINER_NAME"
+echo "Stop:       podman stop $CONTAINER_NAME"
