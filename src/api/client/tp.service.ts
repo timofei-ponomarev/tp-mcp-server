@@ -4,7 +4,7 @@ import { URLSearchParams } from 'node:url';
 import { setTimeout } from 'node:timers/promises';
 import { AssignableEntityData } from '../../entities/assignable/assignable.entity.js';
 import { UserStoryData } from '../../entities/assignable/user-story.entity.js';
-import { ApiResponse, CreateEntityRequest, UpdateEntityRequest } from './api.types.js';
+import { ApiResponse, CreateEntityRequest, UpdateEntityRequest, CreateCommentRequest } from './api.types.js';
 
 type OrderByOption = string | { field: string; direction: 'asc' | 'desc' };
 
@@ -685,6 +685,39 @@ export class TPService {
     } catch (error) {
       console.error('Failed to initialize entity type cache:', error);
       // Don't throw - we'll retry on first use
+    }
+  }
+
+  /**
+   * Create a comment on an entity
+   */
+  async createComment<T>(data: CreateCommentRequest): Promise<T> {
+    try {
+      return await this.executeWithRetry(async () => {
+        const params = new URLSearchParams({ access_token: this.accessToken });
+        const response = await fetch(`${this.baseUrl}/Comments?${params}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        return await this.handleApiResponse<T>(
+          response,
+          'create Comment'
+        );
+      }, 'create Comment');
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+      
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Failed to create comment: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 }

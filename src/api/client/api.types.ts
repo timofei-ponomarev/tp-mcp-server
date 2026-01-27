@@ -33,3 +33,10 @@ export interface UpdateEntityRequest {
     Id: number;
   };
 }
+
+export interface CreateCommentRequest {
+  Description: string;
+  General: {
+    Id: number;
+  };
+}

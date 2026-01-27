@@ -15,6 +15,7 @@ import { GetEntityTool } from './tools/entity/get.tool.js';
 import { CreateEntityTool } from './tools/entity/create.tool.js';
 import { UpdateEntityTool } from './tools/update/update.tool.js';
 import { InspectObjectTool } from './tools/inspect/inspect.tool.js';
+import { CommentTool } from './tools/comment/comment.tool.js';
 
 function loadConfig(): TPServiceConfig {
   // Try environment variables first
@@ -55,6 +56,7 @@ export class TargetProcessServer {
     create: CreateEntityTool;
     update: UpdateEntityTool;
     inspect: InspectObjectTool;
+    comment: CommentTool;
   };
 
   constructor() {
@@ -68,7 +70,8 @@ export class TargetProcessServer {
       get: new GetEntityTool(this.service),
       create: new CreateEntityTool(this.service),
       update: new UpdateEntityTool(this.service),
-      inspect: new InspectObjectTool(this.service)
+      inspect: new InspectObjectTool(this.service),
+      comment: new CommentTool(this.service)
     };
 
     // Initialize server
@@ -84,7 +87,8 @@ export class TargetProcessServer {
             get_entity: true,
             create_entity: true,
             update_entity: true,
-            inspect_object: true
+            inspect_object: true,
+            create_comment: true
           },
         },
       }
@@ -124,6 +128,7 @@ export class TargetProcessServer {
         CreateEntityTool.getDefinition(),
         UpdateEntityTool.getDefinition(),
         InspectObjectTool.getDefinition(),
+        CommentTool.getDefinition(),
       ],
     }));
 
@@ -140,6 +145,8 @@ export class TargetProcessServer {
             return await this.tools.update.execute(request.params.arguments);
           case 'inspect_object':
             return await this.tools.inspect.execute(request.params.arguments);
+          case 'create_comment':
+            return await this.tools.comment.execute(request.params.arguments);
           default:
             throw new McpError(
               ErrorCode.MethodNotFound,
