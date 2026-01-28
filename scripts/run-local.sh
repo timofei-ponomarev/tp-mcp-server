@@ -3,7 +3,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-CONTAINER_NAME="apptio-target-process-mcp"
+CONTAINER_NAME="target-process-mcp"
 
 # Load .env file if it exists
 if [ -f "$PROJECT_DIR/.env" ]; then
@@ -18,6 +18,12 @@ if [ -z "$TP_DOMAIN" ] || [ -z "$TP_ACCESS_TOKEN" ]; then
     exit 1
 fi
 
+# Build image if it doesn't exist
+if ! podman image exists target-process-mcp:local; then
+    echo "Image not found, building..."
+    "$SCRIPT_DIR/build-local.sh"
+fi
+
 # Stop existing container if running
 podman stop "$CONTAINER_NAME" 2>/dev/null || true
 podman rm "$CONTAINER_NAME" 2>/dev/null || true
@@ -27,7 +33,7 @@ podman run -d -it \
   --name "$CONTAINER_NAME" \
   -e TP_DOMAIN="$TP_DOMAIN" \
   -e TP_ACCESS_TOKEN="$TP_ACCESS_TOKEN" \
-  apptio-target-process-mcp:local
+  target-process-mcp:local
 
 echo "Container started: $CONTAINER_NAME"
 echo "View logs:  podman logs -f $CONTAINER_NAME"

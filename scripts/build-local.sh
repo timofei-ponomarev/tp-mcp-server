@@ -20,7 +20,7 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # Create temp directory for logs if it doesn't exist
-TEMP_DIR="/tmp/apptio-target-process-mcp"
+TEMP_DIR="/tmp/target-process-mcp"
 mkdir -p "$TEMP_DIR"
 
 # Setup colored output
@@ -93,7 +93,7 @@ run_step "Building TypeScript" "build" "npm run build" || exit 1
 # Build container image with Podman
 echo "→ Building container image with Podman..."
 if [ "$VERBOSE" = true ]; then
-    if podman build -t apptio-target-process-mcp:local .; then
+    if podman build -t target-process-mcp:local .; then
         echo -e "${GREEN}${CHECK_MARK} Podman build successful${NC}"
     else
         echo -e "${RED}${X_MARK} Podman build failed${NC}"
@@ -101,7 +101,7 @@ if [ "$VERBOSE" = true ]; then
     fi
 else
     PODMAN_LOG="$TEMP_DIR/podman-build.log"
-    if podman build -t apptio-target-process-mcp:local . > "$PODMAN_LOG" 2>&1; then
+    if podman build -t target-process-mcp:local . > "$PODMAN_LOG" 2>&1; then
         echo -e "${GREEN}${CHECK_MARK} Podman build successful${NC} (log: $PODMAN_LOG)"
         check_log_size "$PODMAN_LOG"
     else
@@ -111,4 +111,4 @@ else
     fi
 fi
 
-echo -e "\n${GREEN}Build complete!${NC} Image tagged as apptio-target-process-mcp:local"
+echo -e "\n${GREEN}Build complete!${NC} Image tagged as target-process-mcp:local"
