@@ -24,9 +24,12 @@ if ! podman image exists target-process-mcp:local; then
     "$SCRIPT_DIR/build-local.sh"
 fi
 
-# Stop existing container if running
-podman stop "$CONTAINER_NAME" 2>/dev/null || true
-podman rm "$CONTAINER_NAME" 2>/dev/null || true
+# Stop and remove all containers using this image
+IMAGE_NAME="target-process-mcp:local"
+for container_id in $(podman ps -aq --filter "ancestor=$IMAGE_NAME" 2>/dev/null); do
+    podman stop "$container_id" 2>/dev/null || true
+    podman rm "$container_id" 2>/dev/null || true
+done
 
 # Run in detached mode with stdin open
 podman run -d -it \
