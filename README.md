@@ -39,10 +39,43 @@ TP_ACCESS_TOKEN=your-access-token
 }
 ```
 
-## Запуск
+## Запуск через Podman
+
+### Сборка образа
 
 ```bash
-node build/index.js
+./scripts/build-local.sh
+```
+
+Скрипт выполняет установку зависимостей, линтинг, тесты, сборку TypeScript и создание контейнера.
+
+Для подробного вывода используйте флаг `--verbose`:
+
+```bash
+./scripts/build-local.sh --verbose
+```
+
+### Запуск контейнера
+
+Создайте файл `.env` в корне проекта:
+
+```bash
+TP_DOMAIN=your-domain.tpondemand.com
+TP_ACCESS_TOKEN=your-access-token
+```
+
+Запустите контейнер:
+
+```bash
+./scripts/run-local.sh
+```
+
+Управление контейнером:
+
+```bash
+podman logs -f apptio-target-process-mcp  # логи
+podman attach apptio-target-process-mcp   # подключиться
+podman stop apptio-target-process-mcp     # остановить
 ```
 
 ## MCP Tools
