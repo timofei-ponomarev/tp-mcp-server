@@ -4,7 +4,7 @@ import { URLSearchParams } from 'node:url';
 import { setTimeout } from 'node:timers/promises';
 import { AssignableEntityData } from '../../entities/assignable/assignable.entity.js';
 import { UserStoryData } from '../../entities/assignable/user-story.entity.js';
-import { ApiResponse, CreateEntityRequest, UpdateEntityRequest, CreateCommentRequest } from './api.types.js';
+import { ApiResponse, CreateEntityRequest, UpdateEntityRequest, CreateCommentRequest, CreateRelationRequest, CreateAssignmentRequest, CreateRoleEffortRequest, UpdateRoleEffortRequest } from './api.types.js';
 
 type OrderByOption = string | { field: string; direction: 'asc' | 'desc' };
 
@@ -717,6 +717,354 @@ export class TPService {
       throw new McpError(
         ErrorCode.InvalidRequest,
         `Failed to create comment: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Create a relation between two entities
+   */
+  async createRelation<T>(data: CreateRelationRequest): Promise<T> {
+    try {
+      return await this.executeWithRetry(async () => {
+        const params = new URLSearchParams({ access_token: this.accessToken });
+        const response = await fetch(`${this.baseUrl}/Relations?${params}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        return await this.handleApiResponse<T>(
+          response,
+          'create Relation'
+        );
+      }, 'create Relation');
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Failed to create relation: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Delete a relation by ID
+   */
+  async deleteRelation(id: number): Promise<void> {
+    try {
+      await this.executeWithRetry(async () => {
+        const params = new URLSearchParams({ access_token: this.accessToken });
+        const response = await fetch(`${this.baseUrl}/Relations/${id}?${params}`, {
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorMessage = await this.extractErrorMessage(response);
+          throw new McpError(
+            ErrorCode.InvalidRequest,
+            `delete Relation failed: ${response.status} - ${errorMessage}`
+          );
+        }
+      }, 'delete Relation');
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Failed to delete relation: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Search relations for an entity
+   */
+  async searchRelations<T>(entityId: number): Promise<T[]> {
+    try {
+      const params = new URLSearchParams({
+        format: 'json',
+        where: `(Master.Id eq ${entityId}) or (Slave.Id eq ${entityId})`,
+        include: '[Master,Slave,RelationType]',
+        take: '100'
+      });
+
+      return await this.executeWithRetry(async () => {
+        params.append('access_token', this.accessToken);
+        const response = await fetch(`${this.baseUrl}/Relations?${params}`, {
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        const data = await this.handleApiResponse<ApiResponse<T>>(
+          response,
+          'search Relations'
+        );
+        return data.Items || [];
+      }, 'search Relations');
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Failed to search relations: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Create an assignment (add a person to an entity)
+   */
+  async createAssignment<T>(data: CreateAssignmentRequest): Promise<T> {
+    try {
+      return await this.executeWithRetry(async () => {
+        const params = new URLSearchParams({ access_token: this.accessToken });
+        const response = await fetch(`${this.baseUrl}/Assignments?${params}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        return await this.handleApiResponse<T>(
+          response,
+          'create Assignment'
+        );
+      }, 'create Assignment');
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Failed to create assignment: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Delete an assignment by ID
+   */
+  async deleteAssignment(id: number): Promise<void> {
+    try {
+      await this.executeWithRetry(async () => {
+        const params = new URLSearchParams({ access_token: this.accessToken });
+        const response = await fetch(`${this.baseUrl}/Assignments/${id}?${params}`, {
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorMessage = await this.extractErrorMessage(response);
+          throw new McpError(
+            ErrorCode.InvalidRequest,
+            `delete Assignment failed: ${response.status} - ${errorMessage}`
+          );
+        }
+      }, 'delete Assignment');
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Failed to delete assignment: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Search assignments for an entity
+   */
+  async searchAssignments<T>(entityId: number): Promise<T[]> {
+    try {
+      const params = new URLSearchParams({
+        format: 'json',
+        where: `Assignable.Id eq ${entityId}`,
+        include: '[GeneralUser,Role,Assignable]',
+        take: '100'
+      });
+
+      return await this.executeWithRetry(async () => {
+        params.append('access_token', this.accessToken);
+        const response = await fetch(`${this.baseUrl}/Assignments?${params}`, {
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        const data = await this.handleApiResponse<ApiResponse<T>>(
+          response,
+          'search Assignments'
+        );
+        return data.Items || [];
+      }, 'search Assignments');
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Failed to search assignments: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Create a role effort entry
+   */
+  async createRoleEffort<T>(data: CreateRoleEffortRequest): Promise<T> {
+    try {
+      return await this.executeWithRetry(async () => {
+        const params = new URLSearchParams({ access_token: this.accessToken });
+        const response = await fetch(`${this.baseUrl}/RoleEfforts?${params}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        return await this.handleApiResponse<T>(
+          response,
+          'create RoleEffort'
+        );
+      }, 'create RoleEffort');
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Failed to create role effort: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Update a role effort entry
+   */
+  async updateRoleEffort<T>(id: number, data: UpdateRoleEffortRequest): Promise<T> {
+    try {
+      return await this.executeWithRetry(async () => {
+        const params = new URLSearchParams({ access_token: this.accessToken });
+        const response = await fetch(`${this.baseUrl}/RoleEfforts/${id}?${params}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+
+        return await this.handleApiResponse<T>(
+          response,
+          'update RoleEffort'
+        );
+      }, 'update RoleEffort');
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Failed to update role effort: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Delete a role effort entry
+   */
+  async deleteRoleEffort(id: number): Promise<void> {
+    try {
+      await this.executeWithRetry(async () => {
+        const params = new URLSearchParams({ access_token: this.accessToken });
+        const response = await fetch(`${this.baseUrl}/RoleEfforts/${id}?${params}`, {
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorMessage = await this.extractErrorMessage(response);
+          throw new McpError(
+            ErrorCode.InvalidRequest,
+            `delete RoleEffort failed: ${response.status} - ${errorMessage}`
+          );
+        }
+      }, 'delete RoleEffort');
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Failed to delete role effort: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+
+  /**
+   * Search role efforts for an entity
+   */
+  async searchRoleEfforts<T>(entityId: number): Promise<T[]> {
+    try {
+      const params = new URLSearchParams({
+        format: 'json',
+        where: `Assignable.Id eq ${entityId}`,
+        include: '[Role,Assignable]',
+        take: '100'
+      });
+
+      return await this.executeWithRetry(async () => {
+        params.append('access_token', this.accessToken);
+        const response = await fetch(`${this.baseUrl}/RoleEfforts?${params}`, {
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+
+        const data = await this.handleApiResponse<ApiResponse<T>>(
+          response,
+          'search RoleEfforts'
+        );
+        return data.Items || [];
+      }, 'search RoleEfforts');
+    } catch (error) {
+      if (error instanceof McpError) {
+        throw error;
+      }
+
+      throw new McpError(
+        ErrorCode.InvalidRequest,
+        `Failed to search role efforts: ${error instanceof Error ? error.message : String(error)}`
       );
     }
   }

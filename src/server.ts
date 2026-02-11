@@ -16,6 +16,9 @@ import { CreateEntityTool } from './tools/entity/create.tool.js';
 import { UpdateEntityTool } from './tools/update/update.tool.js';
 import { InspectObjectTool } from './tools/inspect/inspect.tool.js';
 import { CommentTool } from './tools/comment/comment.tool.js';
+import { RelationTool } from './tools/relation/relation.tool.js';
+import { AssignmentTool } from './tools/assignment/assignment.tool.js';
+import { RoleEffortTool } from './tools/role-effort/role-effort.tool.js';
 
 function loadConfig(): TPServiceConfig {
   // Try environment variables first
@@ -57,6 +60,9 @@ export class TargetProcessServer {
     update: UpdateEntityTool;
     inspect: InspectObjectTool;
     comment: CommentTool;
+    relation: RelationTool;
+    assignment: AssignmentTool;
+    roleEffort: RoleEffortTool;
   };
 
   constructor() {
@@ -71,7 +77,10 @@ export class TargetProcessServer {
       create: new CreateEntityTool(this.service),
       update: new UpdateEntityTool(this.service),
       inspect: new InspectObjectTool(this.service),
-      comment: new CommentTool(this.service)
+      comment: new CommentTool(this.service),
+      relation: new RelationTool(this.service),
+      assignment: new AssignmentTool(this.service),
+      roleEffort: new RoleEffortTool(this.service)
     };
 
     // Initialize server
@@ -88,7 +97,17 @@ export class TargetProcessServer {
             create_entity: true,
             update_entity: true,
             inspect_object: true,
-            create_comment: true
+            create_comment: true,
+            create_relation: true,
+            delete_relation: true,
+            search_relations: true,
+            add_assignment: true,
+            remove_assignment: true,
+            get_assignments: true,
+            create_role_effort: true,
+            update_role_effort: true,
+            delete_role_effort: true,
+            get_role_efforts: true
           },
         },
       }
@@ -129,6 +148,16 @@ export class TargetProcessServer {
         UpdateEntityTool.getDefinition(),
         InspectObjectTool.getDefinition(),
         CommentTool.getDefinition(),
+        RelationTool.getCreateDefinition(),
+        RelationTool.getDeleteDefinition(),
+        RelationTool.getSearchDefinition(),
+        AssignmentTool.getCreateDefinition(),
+        AssignmentTool.getDeleteDefinition(),
+        AssignmentTool.getSearchDefinition(),
+        RoleEffortTool.getCreateDefinition(),
+        RoleEffortTool.getUpdateDefinition(),
+        RoleEffortTool.getDeleteDefinition(),
+        RoleEffortTool.getSearchDefinition(),
       ],
     }));
 
@@ -147,6 +176,26 @@ export class TargetProcessServer {
             return await this.tools.inspect.execute(request.params.arguments);
           case 'create_comment':
             return await this.tools.comment.execute(request.params.arguments);
+          case 'create_relation':
+            return await this.tools.relation.executeCreate(request.params.arguments);
+          case 'delete_relation':
+            return await this.tools.relation.executeDelete(request.params.arguments);
+          case 'search_relations':
+            return await this.tools.relation.executeSearch(request.params.arguments);
+          case 'add_assignment':
+            return await this.tools.assignment.executeCreate(request.params.arguments);
+          case 'remove_assignment':
+            return await this.tools.assignment.executeDelete(request.params.arguments);
+          case 'get_assignments':
+            return await this.tools.assignment.executeSearch(request.params.arguments);
+          case 'create_role_effort':
+            return await this.tools.roleEffort.executeCreate(request.params.arguments);
+          case 'update_role_effort':
+            return await this.tools.roleEffort.executeUpdate(request.params.arguments);
+          case 'delete_role_effort':
+            return await this.tools.roleEffort.executeDelete(request.params.arguments);
+          case 'get_role_efforts':
+            return await this.tools.roleEffort.executeSearch(request.params.arguments);
           default:
             throw new McpError(
               ErrorCode.MethodNotFound,

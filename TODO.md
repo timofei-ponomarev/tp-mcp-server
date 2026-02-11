@@ -32,10 +32,14 @@
 - [ ] Add support for combining multiple presets
 
 ### Relationship Exploration
-- [ ] Add a new tool for exploring entity relationships
+- [x] Add a new tool for exploring entity relationships
+  - [x] Implemented `create_relation` tool (Blocker, Duplicate, Relation, Dependency, Link)
+  - [x] Implemented `delete_relation` tool
+  - [x] Implemented `search_relations` tool
+  - [x] Added relation type mapping (Dependency=1, Blocker=2, Relation=3, Link=4, Duplicate=5)
 - [ ] Implement metadata endpoints that return the entity model schema
 - [ ] Create visualization tools for entity relationships
-- [ ] Add helper methods for navigating between related entities
+- [x] Add helper methods for navigating between related entities
 
 ### Batch Queries
 - [ ] Implement a batch query capability for fetching multiple entity types
@@ -99,7 +103,11 @@
 
 ### Phase 2: Core Enhancements (Weeks 3-4)
 - [ ] Enhance preset query library
-- [ ] Implement relationship exploration
+- [x] Implement relationship exploration
+  - [x] Relations tool (create, delete, search)
+  - [x] Assignments tool (add, remove, get)
+  - [x] Role Effort tool (create, update, delete, get)
+  - [x] Expanded update_entity with relations, effort, project/team assignment
 - [ ] Add basic pagination support
 - [ ] Add API discovery capabilities
   - [ ] Implement "discover_api_structure" action
@@ -167,8 +175,14 @@
 - [ ] Add bulk operation support
 - [ ] Add batch query support
 - [ ] Support custom field updates
-- [ ] Add support for entity relations
-- [ ] Add support for comments and attachments
+- [x] Add support for entity relations
+  - [x] Relations tool (create, delete, search) — Blocker, Duplicate, Relation, Dependency, Link
+  - [x] Expanded update_entity with relation fields (userStory, feature, epic, bug, task) with null support
+- [x] Add support for comments and attachments
+  - [x] Comments tool implemented (create_comment)
+- [x] Add support for assignments (add_assignment, remove_assignment, get_assignments)
+- [x] Add support for role effort tracking (create_role_effort, update_role_effort, delete_role_effort, get_role_efforts)
+- [x] Expand update_entity to support project/team/release/iteration assignment and effort fields
 
 ## Performance
 - [ ] Implement result caching
