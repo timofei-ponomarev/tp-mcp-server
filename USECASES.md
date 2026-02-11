@@ -463,6 +463,194 @@ This document outlines common use cases and procedures for interacting with Targ
 - Use date-based filters for period-specific analysis
 - Include relevant metrics for comparison
 
+### 6. Managing Entity Relations
+
+**Purpose:** Create and manage dependencies, blockers, and other relations between work items.
+
+**Business Value:**
+- Visualize and track dependencies between tasks
+- Identify blocking issues proactively
+- Maintain traceability between related work items
+- Support impact analysis for changes
+
+**Using MCP Tools:**
+
+```json
+// Create a blocker relation (Bug 123 blocks UserStory 456)
+{
+  "masterId": 123,
+  "slaveId": 456,
+  "relationType": "Blocker"
+}
+
+// Mark a duplicate (Bug 789 is a duplicate of Bug 123)
+{
+  "masterId": 789,
+  "slaveId": 123,
+  "relationType": "Duplicate"
+}
+
+// Find all relations for an entity
+{
+  "entityId": 123
+}
+
+// Remove a relation
+{
+  "relationId": 42
+}
+```
+
+**Implementation Steps:**
+1. Use `search_relations` to discover existing relations for an entity
+2. Use `create_relation` with appropriate type (Blocker, Duplicate, Relation, Dependency, Link)
+3. Use `delete_relation` to remove outdated relations
+4. Combine with `update_entity` to move entities between features/epics
+
+**Tips:**
+- Relation types: Blocker (master blocks slave), Duplicate, Relation (generic), Dependency, Link
+- Use `search_relations` before creating to avoid duplicate relations
+- Combine with `get_entity` to get full context on related items
+
+### 7. Team Assignment and Role Management
+
+**Purpose:** Manage people assignments and role-based effort tracking for work items.
+
+**Business Value:**
+- Ensure proper team allocation across projects
+- Track effort by role for accurate capacity planning
+- Support resource management and workload balancing
+- Enable role-based reporting and analysis
+
+**Using MCP Tools:**
+
+```json
+// Assign a user to a work item with a specific role
+{
+  "entityId": 12345,
+  "userId": 678,
+  "roleId": 1
+}
+
+// Get all people assigned to a work item
+{
+  "entityId": 12345
+}
+
+// Remove an assignment
+{
+  "assignmentId": 42
+}
+
+// Create role-based effort entry
+{
+  "entityId": 12345,
+  "roleId": 1,
+  "effort": 16
+}
+
+// Update effort tracking (time spent, remaining)
+{
+  "roleEffortId": 99,
+  "effort": 24,
+  "effortCompleted": 10,
+  "effortToDo": 14
+}
+
+// Get all role efforts for a work item
+{
+  "entityId": 12345
+}
+```
+
+**Implementation Steps:**
+1. Use `get_assignments` to see current assignments on an entity
+2. Use `add_assignment` to add users with optional role
+3. Use `remove_assignment` to remove outdated assignments
+4. Use `create_role_effort` to set up effort tracking by role
+5. Use `update_role_effort` to track progress (effort, effortCompleted, effortToDo)
+6. Use `get_role_efforts` to analyze effort distribution
+
+**Tips:**
+- Always check existing assignments before adding new ones
+- Use `roleId` to differentiate between Developer, QA, Designer, etc.
+- Combine with `update_entity` effort fields for overall effort tracking
+
+### 8. Moving Entities Between Projects and Teams
+
+**Purpose:** Reorganize work items across projects, teams, releases, and iterations.
+
+**Business Value:**
+- Support team restructuring and project reorganization
+- Enable release planning and sprint management
+- Maintain proper entity hierarchy (Epic -> Feature -> UserStory -> Task)
+
+**Using MCP Tools:**
+
+```json
+// Move a UserStory to a different feature
+{
+  "type": "UserStory",
+  "id": 12345,
+  "fields": {
+    "feature": { "id": 678 }
+  }
+}
+
+// Reassign to a different team and project
+{
+  "type": "UserStory",
+  "id": 12345,
+  "fields": {
+    "team": { "id": 111 },
+    "project": { "id": 222 }
+  }
+}
+
+// Assign to a release and iteration
+{
+  "type": "UserStory",
+  "id": 12345,
+  "fields": {
+    "release": { "id": 333 },
+    "iteration": { "id": 444 },
+    "teamIteration": { "id": 555 }
+  }
+}
+
+// Remove from current feature (unlink)
+{
+  "type": "UserStory",
+  "id": 12345,
+  "fields": {
+    "feature": null
+  }
+}
+
+// Set effort estimates
+{
+  "type": "UserStory",
+  "id": 12345,
+  "fields": {
+    "effort": 16,
+    "effortCompleted": 4,
+    "effortToDo": 12
+  }
+}
+```
+
+**Implementation Steps:**
+1. Identify entities that need to be moved
+2. Use `update_entity` to set new project, team, release, or iteration
+3. Use null values to remove relations (feature, epic, release, etc.)
+4. Update effort fields as needed
+5. Verify changes with `get_entity`
+
+**Tips:**
+- Use `null` to explicitly remove a relation (feature, epic, release, iteration, teamIteration)
+- Non-nullable references (project, team) cannot be set to null
+- Combine with `search_entities` to batch find and update items
+
 ## Best Practices
 
 1. **Error Handling:**
